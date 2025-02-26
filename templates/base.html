@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>B'z Notes Pro - {% block title %}{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  
+  <style>
+    :root {
+        --space: #0f0f1f;
+        --primary: #6c5ce7;
+        --accent: #f1c40f;
+        --neon: 0 0 15px rgba(108,92,231,0.5);
+        --text: #f8f9fa;
+        --bg-dark: #0f0f1f;
+    }
+
+    body {
+        background: var(--space);
+        color: var(--text);
+        font-family: 'Space Grotesk', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    
+    html {
+        overflow-y: scroll;
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 6px;
+        border: 2px solid #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Notification Page Styling */
+    .notification-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .notification-card:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .notification-card a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .notification-card .timestamp {
+        font-size: 0.9rem;
+        color: #bbb;
+    }
+  </style>
+  {% block styles %}{% endblock %}
+</head>
+<body>
+  <header class="cyber-header">
+    <div class="neural-nav">
+      <div class="cyber-logo" onclick="location.href='{{ url_for('home') }}'">
+        <strong>B'z Notes</strong>
+      </div>
+      <nav class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('about') }}" class="nav-link">About</a>
+        <a href="{{ url_for('privacy_policy') }}" class="nav-link">Privacy and policy</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('notifications') }}" class="nav-link">Notifications</a>
+          <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+          <button id="nightModeBtn" class="quantum-button">Night Mode</button>
+        {% else %}
+          <a href="{{ url_for('register') }}" class="nav-link">Register</a>
+          <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="quantum-container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="cyber-footer">
+    &copy; 2025 B'z Notes Pro. All rights reserved.
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script>
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + '/notifications');
+
+    socket.on('notify_{{ current_user.id }}', function(message) {
+        const notificationList = document.getElementById('notification-list');
+        const newNotification = document.createElement('li');
+        newNotification.className = 'notification-card';
+        notificationList.prepend(newNotification);
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

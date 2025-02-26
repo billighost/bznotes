@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}{{ story.title }}{% endblock %}
+{% block content %}
+
+<div class="story-container">
+    <!-- 🏆 Story Header -->
+    <div class="story-header">
+        <h1 class="story-title">{{ story.title }}</h1>
+        <div class="author-info">
+            <p class="author-name">By 
+                <a href="{{ url_for('user_profile', user_id=story.user_id) }}" class="writer-link">
+                    {{ story.user.username }}
+                </a>
+            </p>
+            <p class="story-meta">
+                📅 {{ story.created_at.strftime('%b %d, %Y') }} |
+                ❤️ <span id="like-count">{{ likes_count }}</span> Likes |
+                💬 <span id="comment-count">{{ comments|length }}</span> Comments
+            </p>
+        </div>
+    </div>
+
+    <!-- 🎨 Cover Image -->
+    {% if story.cover_image %}
+    <img src="{{ story.cover_image }}" alt="Cover Image" class="story-cover">
+    {% endif %}
+
+    <!-- 📖 Story Content (Formatted) -->
+    <div class="story-content">{{ story.content.replace("\n\n", "</p><p>").replace("\n", " ") | safe }}</div>
+
+    <!-- ❤️ Like Button -->
+    {% if current_user.is_authenticated and story.user_id != current_user.id %}
+    <div class="interaction-buttons">
+        <button id="like-btn" class="like-button {% if current_user in story.likes %}liked{% endif %}" 
+                onclick="toggleLike({{ story.id }})">
+            {{ '❤️ Unlike' if current_user in story.likes else '🤍 Like' }}
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- 💬 Comments Section -->
+    <div class="comments-section">
+        <h2 class="comments-header">💬 Comments (<span id="comment-count-badge">{{ comments|length }}</span>)</h2>
+
+        {% if current_user.is_authenticated %}
+        <form id="comment-form" class="comment-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <textarea name="content" placeholder="Share your thoughts..." required class="comment-input"></textarea>
+            <button type="submit" class="comment-submit">Post Comment ✨</button>
+        </form>
+        {% else %}
+        <div class="auth-prompt">
+            <a href="{{ url_for('login') }}">Login</a> to join the conversation
+        </div>
+        {% endif %}
+
+        <ul class="comments-list" id="comments-list">
+            {% for comment in comments %}
+            <li class="comment-item">
+                <img src="{{ comment.user.profile_picture_url or url_for('static', filename='default-avatar.png') }}" 
+                     class="comment-avatar">
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">{{ comment.user.username }}</span>
+                        <span class="comment-time">{{ comment.created_at.strftime('%b %d, %Y %H:%M') }}</span>
+                    </div>
+                    <p class="comment-text">{{ comment.content | replace('\n', '<br>') | safe }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- SOCKET.IO & JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+
+<script>
+var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+// ✅ Listen for Real-Time Like Updates
+socket.on('like_updated', function(data) {
+    var storyId = data.story_id;
+    var newLikeCount = data.likes;
+    
+    var likeCountElement = document.getElementById("like-count");
+    if (likeCountElement) {
+        likeCountElement.textContent = newLikeCount;
+    }
+
+    var likeBtn = document.getElementById("like-btn");
+    if (likeBtn) {
+        likeBtn.textContent = data.liked ? "❤️ Unlike" : "🤍 Like";
+        likeBtn.classList.toggle('liked', data.liked);
+    }
+});
+
+// ✅ Toggle Like Function (Real-Time)
+async function toggleLike(storyId) {
+    try {
+        const likeBtn = document.getElementById('like-btn');
+        const likeCount = document.getElementById('like-count');
+
+        const response = await fetch(`/like_story/${storyId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value  
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error('Failed to update like: ' + errorText);
+        }
+
+        const data = await response.json();
+
+        likeBtn.textContent = data.liked ? "❤️ Unlike" : "🤍 Like";
+        likeBtn.classList.toggle('liked', data.liked);
+        likeCount.textContent = data.likes;
+        
+        socket.emit('like_story', { story_id: storyId });
+
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+        if (error.message.includes('Unauthorized')) {
+            window.location.href = "{{ url_for('login') }}";
+        }
+    }
+}
+
+// ✅ Real-Time Comment Submission
+document.getElementById('comment-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const content = formData.get('content');
+
+    try {
+        const response = await fetch("{{ url_for('add_comment', story_id=story.id) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) throw new Error('Failed to post comment');
+
+        const comment = await response.json();
+        addNewComment(comment);
+        e.target.reset();
+        updateCommentCount(1);
+
+    } catch (error) {
+        showToast(error.message, true);
+    }
+});
+
+// ✅ Append New Comment to List (Instantly)
+function addNewComment(comment) {
+    const commentList = document.getElementById('comments-list');
+    const newComment = document.createElement('li');
+    newComment.className = 'comment-item';
+    newComment.innerHTML = `
+        <img src="${comment.profile_picture_url || '{{ url_for('static', filename='default-avatar.png') }}'}" class="comment-avatar">
+        <div class="comment-content">
+            <div class="comment-header">
+                <span class="comment-author">${comment.username}</span>
+                <span class="comment-time">Just now</span>
+            </div>
+            <p class="comment-text">${comment.content.replace(/\n/g, '<br>')}</p>
+        </div>
+    `;
+    commentList.prepend(newComment);
+}
+
+// ✅ Update Comment Count
+function updateCommentCount(change) {
+    document.getElementById('comment-count').textContent =
+        parseInt(document.getElementById('comment-count').textContent) + change;
+    document.getElementById('comment-count-badge').textContent =
+        parseInt(document.getElementById('comment-count-badge').textContent) + change;
+}
+
+// ✅ Toast Notifications
+function showToast(message, isError = false) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${isError ? 'error' : ''}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>   
+
+
+
+
+<!-- 🎨 Enhanced Styles -->
+<style>
+/* 📌 Enhanced Story Page Styles */
+.story-title, .author-info, .story-content, .comments-section {
+    color: #222 !important; /* Force text to be visible */
+}
+
+.comment-text, .comment-author, .comment-time {
+    color: #444 !important;
+}
+.story-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    color: #222; /* Dark text for better readability */
+    border-radius: 10px;
+}
+
+.story-cover {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin: 2rem 0;
+}
+
+.story-content {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    white-space: pre-line;
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 10px;
+}
+.story-content p {
+    margin-bottom: 1px; /* Reduce spacing between paragraphs */
+    line-height: 1.6; /* Keep readability good */
+}
+
+.comments-list p {
+    margin-bottom: 5px; /* Adjust spacing for comments */
+}
+
+.like-button {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.like-button.liked {
+    background: #ff4757;
+    color: white;
+}
+
+.comment-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    margin: 1rem 0;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.comment-submit {
+    padding: 0.5rem 1rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.comment-submit:hover {
+    background: #0056b3;
+}
+p {
+    margin-bottom: 10px;  /* Reduce space between paragraphs */
+    line-height: 1.6;     /* Adjust readability */
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block title %}Calendar{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <!-- Live Date and Time -->
+    <div class="datetime">
+        <h1 id="live-date"></h1>
+        <h2 id="live-time"></h2>
+    </div>
+
+    <h1 class="quantum-container"id="year-title">📅 Calendar - <span id="current-year"></span></h1>
+
+    <!-- Navigation for changing years -->
+    <div class="calendar-nav">
+        <button onclick="changeYear(-1)">◀ Previous Year</button>
+        <button onclick="changeYear(1)">Next Year ▶</button>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div id="calendar"></div>
+</div>
+
+<script>
+// ✅ Live Date & Time
+function updateTime() {
+    const now = new Date();
+    document.getElementById("live-date").textContent = now.toDateString();
+    document.getElementById("live-time").textContent = now.toLocaleTimeString();
+}
+setInterval(updateTime, 1000);
+updateTime();  // Initial call
+
+// ✅ Generate Calendar Dynamically
+document.addEventListener("DOMContentLoaded", function () {
+    const currentYear = new Date().getFullYear();
+    document.getElementById("current-year").textContent = currentYear;
+    generateCalendar(currentYear);
+});
+
+function generateCalendar(year) {
+    const calendarDiv = document.getElementById("calendar");
+    calendarDiv.innerHTML = ""; // Clear previous calendar
+    document.getElementById("current-year").textContent = year;
+
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    for (let i = 0; i < 12; i++) {
+        const monthDiv = document.createElement("div");
+        monthDiv.className = "month";
+
+        const monthTitle = document.createElement("h3");
+        monthTitle.textContent = months[i];
+        monthDiv.appendChild(monthTitle);
+
+        const daysGrid = document.createElement("div");
+        daysGrid.className = "days-grid";
+
+        // Add day names
+        daysOfWeek.forEach(day => {
+            const dayHeader = document.createElement("div");
+            dayHeader.className = "day-name";
+            dayHeader.textContent = day;
+            daysGrid.appendChild(dayHeader);
+        });
+
+        const firstDay = new Date(year, i, 1).getDay();
+        const daysInMonth = new Date(year, i + 1, 0).getDate();
+
+        // Add empty slots for first row
+        for (let d = 0; d < firstDay; d++) {
+            const emptySlot = document.createElement("span");
+            emptySlot.className = "empty-slot";
+            daysGrid.appendChild(emptySlot);
+        }
+
+        // Add actual days
+        for (let d = 1; d <= daysInMonth; d++) {
+            const day = document.createElement("span");
+            day.className = "day";
+            day.textContent = d;
+
+            // Highlight the current day with a glowing effect
+            if (year === currentYear && i === currentMonth && d === currentDay) {
+                day.classList.add("current-day");
+            }
+
+            daysGrid.appendChild(day);
+        }
+
+        monthDiv.appendChild(daysGrid);
+        calendarDiv.appendChild(monthDiv);
+    }
+}
+
+// ✅ Change Year
+function changeYear(direction) {
+    const year = parseInt(document.getElementById("current-year").textContent);
+    generateCalendar(year + direction);
+}
+</script>
+
+<style>
+/* 📌 Calendar Styles */
+.calendar-container {
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 🔄 Live Date & Time */
+.datetime {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* 🔄 Navigation */
+.calendar-nav button {
+    background: #6c5ce7;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 📅 Month Layout */
+.month {
+    margin: 20px 0;
+    padding: 10px;
+    background: #222;
+    border-radius: 10px;
+    color: white;
+}
+
+/* 📅 Days Grid */
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    padding: 10px;
+}
+
+/* 📅 Day Names */
+.day-name {
+    font-weight: bold;
+    color: #f1c40f;
+    text-align: center;
+    padding: 5px;
+}
+
+/* 📅 Days */
+.day {
+    background: #444;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* 📅 Hover Effect */
+.day:hover {
+    background: #f1c40f;
+    color: black;
+}
+
+/* 📅 Empty Slot for Alignment */
+.empty-slot {
+    background: transparent;
+}
+
+/* 🌟 Glowing Effect for Current Day */
+.current-day {
+    background: #ff4757;
+    color: white;
+    box-shadow: 0 0 20px #ff4757;
+    font-weight: bold;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 5px #ff4757;
+    }
+    to {
+        box-shadow: 0 0 20px #ff4757;
+    }
+}
+</style>
+
+{% endblock %}

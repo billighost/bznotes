@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}View Notification{% endblock %}
+{% block content %}
+
+<div class="view-notification">
+    <h1>🔔 Notification</h1>
+    <div class="notification-message">{{ notification.message.replace("\n\n", "</p><p>").replace("\n", " ") | safe }}</div>
+    <p class="notification-timestamp">🕒 {{ notification.timestamp.strftime('%b %d, %Y %H:%M') }}</p>
+    <a href="{{ url_for('notifications_page') }}" class="back-button">⬅ Back to Notifications</a>
+</div>
+
+<style>
+    .view-notification {
+        max-width: 600px;
+        margin: auto;
+        padding: 2rem;
+        background: #222;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .notification-message {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .notification-timestamp {
+        font-size: 1rem;
+        color: #bbb;
+    }
+
+    .back-button {
+        display: block;
+        margin-top: 2rem;
+        text-decoration: none;
+        color: white;
+        background: var(--primary);
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+
+    .back-button:hover {
+        background: var(--accent);
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+
+<div class="quantum-container" style="max-width: 900px; margin: auto; text-align: center; padding: 40px;">
+  <img src="{{ url_for('static', filename='images/profile.jpg') }}" alt="Developer" style="width: 180px; border-radius: 50%; box-shadow: 0 0 10px rgba(241, 196, 15, 0.7);">
+</div class="quantum-container" style="max-width: 900px; margin: auto; text-align: center; padding: 40px;"> 
+<div>
+  <h2 class="cyber-logo" style="margin-top: 15px; color: var(--accent);">About Developer</h2>
+  <p>Hello! I am Bello Bilal Olamiposi, the creator of B'z Notes Pro. My passion is creating innovative digital experiences to help you capture your ideas and stories.If you have any suggestions or complaints,reach out to me at:</p>
+  <div style="margin-top: 20px;">
+    <p>📞 <a href="tel:+2349048428304" style="color:#f1c40f; text-decoration: none;">+234 904 842 8304</a></p>
+    <p>📧 <a href="mailto:bb2010ng@gmail.com" style="color:#f1c40f; text-decoration: none;">bb2010ng@gmail.com</a></p>
+  
+  <h2 class="cyber-logo" style="margin-top: 15px; color: var(--accent);">What is B'z Notes Pro?</h2>
+  <p>
+      B'z Notes Pro is your ultimate digital notebook that combines writing,publishing,socializiing, journaling, and note-taking in one seamless experience.
+  </p>
+  <h3>Features:</h3>
+  <ul>
+      <li>Interactive reading area</li>
+      <li>User-Friendly writing space</li>
+      <li>Rich text editing</li>
+      <li>Story publishing</li>
+      <li>Getting filtered content based on interests</li>
+      <li>Secure user accounts</li>
+      <li>And many more...</li>
+  </ul>
+</div>
+
+  <div style="margin-top: 30px;">
+    <a href="{{ url_for('home') }}" class="cyber-logo">Go Home</a>
+  </div>
+
+</div>
+
+{% endblock %}

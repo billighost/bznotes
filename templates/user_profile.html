@@ -1,0 +1,19 @@
+<!-- User Profile Page -->
+{% extends "base.html" %}
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+{% block content %}
+
+<div class="profile-container">
+    <img src="{{ user.profile_picture_url or '/static/default-avatar.png' }}" alt="Profile Picture" class="comment-avatar">
+    <h1>{{ user.username }}</h1>
+    <p class="bio">{{ user.bio or 'No bio available.' }}</p>
+</div>
+<style>
+.comment-avatar {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+</style>
+{% endblock %}

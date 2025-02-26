@@ -1,0 +1,13 @@
+<h2>Send Notification</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        <label>{{ form.notification.label }}</label>
+        {{ form.notification(class="form-control") }}
+    </div>
+    <div>
+        <label>{{ form.username.label }}</label>
+        {{ form.username(class="form-control") }}
+    </div>
+    <button type="submit">Send Notification</button>
+</form>

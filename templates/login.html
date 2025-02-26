@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="cosmic-container">
+  <h1>Welcome Back!</h1>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul style="list-style:none; padding:0; margin:10px 0;">
+        {% for message in messages %}
+          <li class="cyber-alert">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  <form method="POST" action="{{ url_for('login') }}" style="margin-top:20px;">
+    {{ form.csrf_token }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div style="margin-bottom:15px;">
+      <label for="email">Email</label>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="email" id="email" name="email" required autocomplete="email" style="width:100%; padding:10px;">
+    </div>
+    <div style="margin-bottom:15px;">
+      <label for="password">Password</label>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="password" id="password" name="password" required autocomplete="current-password" style="width:100%; padding:10px;">
+    </div>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="text" name="fullname" style="display:none !important" tabindex="-1">
+    <div style="text-align:center; margin-top:10px;">
+      <a href="{{ url_for('forgot_password') }}" style="color:#f1c40f;">Forgot Password?</a>
+    </div>
+    <div style="margin-top:15px; display:flex; align-items:center;">
+      {{ form.remember }}
+      <label for="remember" style="margin-left:5px;">Remember me</label>
+    </div>
+    <div style="margin-top:20px;">
+      <input type="submit" value="Login" style="width:100%; padding:10px; background:#f1c40f; color:#2c3e50; border:none; border-radius:5px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    </div>
+  </form>
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="window.location.href='{{ url_for('home') }}'" style="padding:10px 15px; margin:5px;">Home</button>
+    <button onclick="window.location.href='{{ url_for('about') }}'" style="padding:10px 15px; margin:5px;">About</button>
+  </div>
+</div>
+{% endblock %}

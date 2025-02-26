@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Write Story{% endblock %}
+{% block content %}
+
+<div class="quantum-container">
+  <h1>📝 Story Forge</h1>
+
+  <div>
+    <button onclick="location.href='{{ url_for('dashboard') }}'" class="quantum-button">🏠 Dashboard</button>
+    <button onclick="addChapter()" class="quantum-button">➕ New Chapter</button>
+  </div>
+
+  <div class="chapter-timeline">
+    {% for chapter in story.chapters %}
+      <div class="chapter-node" data-id="{{ chapter.id }}" draggable="true">
+        {{ chapter.title or "Untitled" }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="story-core">
+    <input type="text" id="storyTitle" placeholder="📖 Story Title" value="{{ story.title }}" class="quantum-input">
+    <textarea id="storyContent" placeholder="✍️ Write your story here..." class="quantum-editor">{{ current_chapter.content }}</textarea>
+
+    <div class="form-actions">
+      <button onclick="saveDraft()" class="quantum-button">💾 Save Draft</button>
+      <button type="button" class="quantum-button spellcheck-toggle" onclick="toggleSpellCheck()">Toggle Spellcheck</button>
+      <button onclick="postStory()" class="quantum-button success">🚀 Post Story</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function addChapter() { alert("Add chapter functionality to be implemented"); }
+
+function saveDraft() {
+  const data = {
+    draft_id: "{{ draft.id if draft else '' }}",
+    title: document.getElementById('storyTitle').value,
+    content: document.getElementById('storyContent').value
+  };
+
+  fetch('/save_draft', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(response => response.json()).then(result => {
+    if(result.success) {
+      alert("Draft saved!");
+    } else {
+      alert("Error saving draft");
+    }
+  });
+}
+
+function postStory() {
+  fetch('/post_story', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ draft_id: "{{ draft.id if draft else '' }}" })
+  }).then(response => response.json()).then(result => {
+    if(result.success) {
+      alert("Story posted!");
+      location.href = '/read-stories';
+    } else {
+      alert("Error posting story");
+    }
+  });
+}
+</script>
+
+{% endblock %}

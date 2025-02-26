@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+
+<div class="quantum-container">
+  <h1>😃 Your Profile</h1>
+
+  <div class="profile-section">
+    <div class="profile-picture">
+      <img src="{{ user.profile_picture_url }}" alt="Profile Picture" class="profile-img">
+      <form method="POST" action="{{ url_for('upload_profile_picture') }}" enctype="multipart/form-data">
+        <input type="file" name="profile_picture" accept="image/*">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="quantum-button">📸 Update Picture</button>
+      </form>
+    </div>
+
+    <div class="profile-info">
+      <h2>{{ user.username }}</h2>
+      <p>📧 {{ user.email }}</p>
+
+      <form method="POST" action="{{ url_for('update_profile') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="bio">📝 Bio</label>
+        <textarea id="bio" name="bio" rows="4" class="quantum-editor" placeholder="Write your bio">{{ user.bio }}</textarea>
+        <button type="submit" class="quantum-button">📝Update Bio</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+  .profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--primary);
+  }
+  .profile-info {
+    text-align: center;
+  }
+</style>
+{% endblock %}

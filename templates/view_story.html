@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}View Story{% endblock %}
+{% block content %}
+
+<div class="quantum-container">
+  <h1>📖 {{ story.title }}</h1>
+  <h3>By <a href="{{ url_for('profile', user_id=story.author.id) }}">{{ story.author.username }}</a></h3>
+
+  <!-- Follow Writer Button -->
+  {% if current_user != story.author %}
+  <button id="follow-btn" class="quantum-button" onclick="followWriter('{{ story.author.id }}')">
+    {% if story.author in current_user.following %}
+      ✅ Following
+    {% else %}
+      ➕ Follow Writer
+    {% endif %}
+  </button>
+  {% endif %}
+
+  <!-- Font Selector -->
+  <div>
+    <label for="storyFontSelector">🖋️ Change Font:</label>
+    <select id="storyFontSelector" name="font" class="quantum-input">
+        <option value="'Poppins', sans-serif">Poppins</option>
+        <option value="'Roboto', sans-serif">Roboto</option>
+        <option value="'Space Mono', monospace">Space Mono</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="'Arial', sans-serif">Arial</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+        <option value="'Verdana', sans-serif">Verdana</option>
+        <option value="'Georgia', serif">Georgia</option>
+        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+        <option value="'Lucida Console', monospace">Lucida Console</option>
+        <option value="'Tahoma', sans-serif">Tahoma</option>
+        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+        <option value="'Impact', sans-serif">Impact</option>
+        <option value="'Garamond', serif">Garamond</option>
+        <option value="'Calibri', sans-serif">Calibri</option>
+        <option value="'Futura', sans-serif">Futura</option>
+        <option value="'Baskerville', serif">Baskerville</option>
+        <option value="'Helvetica', sans-serif">Helvetica</option>
+        <option value="'Didot', serif">Didot</option>
+        <!-- Add more fonts as desired -->
+    </select>
+  </div>
+
+  <button class="quantum-button" onclick="location.href='{{ url_for('new_chapter', story_id=story.id) }}'">
+    ✏️ New Chapter
+  </button>
+
+  <h2>📜 Chapters</h2>
+  <div id="chaptersContainer" class="hologram-grid">
+    {% for chapter in chapters %}
+      <div class="holo-card" data-id="{{ chapter.id }}" onclick="location.href='{{ url_for('edit_chapter', chapter_id=chapter.id) }}'">
+        <h3>{{ chapter.title or 'Untitled Chapter' }}</h3>
+        <p>{{ chapter.content|truncate(150) }}</p>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h3>No chapters yet</h3>
+        <p>Click "New Chapter" to add one.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+document.getElementById('storyFontSelector').addEventListener('change', (e) => {
+  document.querySelectorAll('#chaptersContainer .holo-card').forEach(card => {
+    card.style.fontFamily = e.target.value;
+  });
+});
+
+function followWriter(authorId) {
+  fetch(`/follow/${authorId}`, { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('follow-btn').innerText = '✅ Following';
+        alert(data.message);
+      }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
+{% endblock %}

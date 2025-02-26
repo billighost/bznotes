@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}New Diary Entry{% endblock %}
+{% block content %}
+
+<div class="quantum-container">
+  <h1>📔 New Diary Entry</h1>
+
+  <form method="POST" action="{{ url_for('new_diary') }}">
+    {{ form.csrf_token }}  <!-- ✅ Use CSRF token explicitly -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="form-group">
+      <label for="fontSelector">🖋️ Choose Font:</label>
+      <select id="fontSelector" name="font" class="quantum-input">
+            <option value="'Poppins', sans-serif">Poppins</option>
+            <option value="'Roboto', sans-serif">Roboto</option>
+            <option value="'Space Mono', monospace">Space Mono</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="'Arial', sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="'Verdana', sans-serif">Verdana</option>
+            <option value="'Georgia', serif">Georgia</option>
+            <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+            <option value="'Lucida Console', monospace">Lucida Console</option>
+            <option value="'Tahoma', sans-serif">Tahoma</option>
+            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+            <option value="'Impact', sans-serif">Impact</option>
+            <option value="'Garamond', serif">Garamond</option>
+            <option value="'Calibri', sans-serif">Calibri</option>
+            <option value="'Futura', sans-serif">Futura</option>
+            <option value="'Baskerville', serif">Baskerville</option>
+            <option value="'Helvetica', sans-serif">Helvetica</option>
+            <option value="'Didot', serif">Didot</option>
+            <!-- Add more fonts as desired -->
+        </select>
+    
+    </div>
+
+    <div class="form-group">
+      <label for="content">📝 Entry Content</label>
+      <textarea name="content" id="content" rows="10" class="quantum-editor" placeholder="Write your diary entry here..." required></textarea>
+    </div>
+    <!-- Spellcheck Toggle -->
+    <div class="form-group">
+        <label class="elegant-label">✔️ Spellcheck</label>
+        <button type="button" id="spellcheck-toggle" class="elegant-button" onclick="toggleSpellcheck()">🔠 OFF</button>
+    </div>
+    <button type="submit" class="quantum-button">💾 Save Entry</button>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fontSelector = document.getElementById('fontSelector');
+  const contentArea = document.getElementById('content');
+
+  fontSelector.addEventListener('change', (e) => {
+    contentArea.style.fontFamily = e.target.value;
+  });
+});
+function toggleSpellcheck() {
+    let editor = document.getElementById("content");
+    let button = document.getElementById("spellcheck-toggle");
+    let spellcheckState = localStorage.getItem("spellcheck") === "true";
+
+    editor.spellcheck = !spellcheckState;
+    button.innerText = editor.spellcheck ? "🔠 ON" : "🔠 OFF";
+    button.style.backgroundColor = editor.spellcheck ? "#4CAF50" : "#FF4B2B";
+
+    localStorage.setItem("spellcheck", editor.spellcheck);
+}
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+  .form-group {
+    margin-bottom: 15px;
+  }
+</style>
+{% endblock %}

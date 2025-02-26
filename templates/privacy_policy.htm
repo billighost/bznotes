@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Privacy & Policy{% endblock %}
+
+{% block content %}
+<div class="privacy-wrapper">
+  <!-- Animated cosmic background -->
+  <div class="cosmic-bg"></div>
+  
+  <!-- Container for the policy content -->
+  <div class="policy-container">
+    <h1 class="glowing-title">B'z Notes Pro — Privacy & Policy</h1>
+    
+    <!-- Example privacy text (replace with your actual policy) -->
+    <p>
+      Welcome to <strong>B'z Notes Pro</strong>. We respect your privacy and are committed
+      to protecting your personal information. This Privacy & Policy page describes the types
+      of information we collect from you, how we use it, and the measures we take to keep it safe.
+    </p>
+
+    <h2>1. Information We Collect</h2>
+    <p>
+      We may collect personal data such as your username, email address, and usage data.
+      We do not share or sell your information to any third party, except as required by law
+      or to provide our core services.
+    </p>
+
+    <h2>2. How We Use Your Data</h2>
+    <p>
+      We primarily use your data to improve your experience within <strong>B'z Notes Pro</strong>. 
+      This may include personalization of content, responding to your queries, or analyzing usage 
+      trends to enhance platform features.
+    </p>
+
+    <h2>3. Data Security</h2>
+    <p>
+      We implement industry-standard security measures to safeguard your personal information 
+      against unauthorized access, alteration, disclosure, or destruction.
+    </p>
+
+    <h2>4. Cookies & Tracking</h2>
+    <p>
+      Our service may use cookies to remember user preferences and gather analytics data.
+      You can disable cookies in your browser settings, but some features may not function properly.
+    </p>
+
+    <h2>5. Updates to This Policy</h2>
+    <p>
+      We reserve the right to modify this policy at any time. We will notify you of any 
+      significant changes by posting the new policy here. 
+    </p>
+
+    <h2>6. Contact Us</h2>
+    <p>
+      If you have any questions about this Privacy & Policy, please contact us at 
+      <strong>bb2010ng@gmail.com</strong>.
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* 
+  🎨 STYLES FOR A COSMIC, WORLD-RECORD LOOK 
+  With an animated starfield background & glowing titles 
+*/
+
+/* Overall wrapper to position everything */
+.privacy-wrapper {
+  position: relative;
+  min-height: 90vh;
+  padding: 2rem;
+  overflow: hidden; /* Hide the cosmic animation edges */
+}
+
+/* Animated cosmic background container */
+.cosmic-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #1c1c44 0%, #000 80%);
+  overflow: hidden;
+  z-index: -1; /* behind the text content */
+  animation: cosmicPulse 10s infinite alternate ease-in-out;
+}
+
+/* Keyframes for subtle cosmic pulsing */
+@keyframes cosmicPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+/* Container for the actual text content */
+.policy-container {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(6px);
+  border-radius: 15px;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #333;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Glowing title effect */
+.glowing-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #ff6c6c;
+  text-shadow: 
+    0 0 5px rgba(255, 108, 108, 0.5),
+    0 0 10px rgba(255, 108, 108, 0.4),
+    0 0 20px rgba(255, 108, 108, 0.2);
+}
+
+/* Headings inside the policy */
+.policy-container h2 {
+  margin-top: 1.5rem;
+  color: #333;
+  font-size: 1.6rem;
+  text-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+
+/* Paragraph styling */
+.policy-container p {
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+}
+
+/* Make strong text stand out more with color */
+.policy-container strong {
+  color: #ff5050;
+}
+
+/* Example link styling */
+.policy-container a {
+  color: #007bff;
+  text-decoration: none;
+}
+.policy-container a:hover {
+  text-decoration: underline;
+}
+
+/* Make sure it looks good on mobile */
+@media screen and (max-width: 600px) {
+  .policy-container {
+    padding: 1rem;
+  }
+  .glowing-title {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}

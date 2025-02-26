@@ -1,0 +1,20 @@
+<h2>Determine Likes</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}  <!-- ✅ Secure CSRF Token -->
+    
+    <div>
+        <label>Head Likes:</label>
+        {{ form.head_likes(class="form-control") }}
+    </div>
+    <div>
+        <label>Admin Likes:</label>
+        {{ form.admin_likes(class="form-control") }}
+    </div>
+    <div>
+        <label>User Likes:</label>
+        {{ form.user_likes(class="form-control") }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+</form>
+

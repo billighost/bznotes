@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+
+<div class="notifications-page">
+    <h1>🔔 Notifications</h1>
+
+    {% if notifications %}
+        <div class="notification-grid">
+            {% for notification in notifications %}
+            <div class="holo-card" onclick="location.href='{{ url_for('view_notification', notification_id=notification.id) }}'">
+                <p class="notification-title">{{ notification.message|truncate(50) }}</p>
+                <p class="notification-timestamp">🕒 {{ notification.timestamp.strftime('%b %d, %Y %H:%M') }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No new notifications.</p>
+    {% endif %}
+</div>
+
+<style>
+    .notification-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 2rem;
+    }
+
+    .notification-card {
+        background: #222;
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .notification-card:hover {
+        background: var(--primary);
+    }
+
+    .notification-title {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .notification-timestamp {
+        font-size: 0.9rem;
+        color: #bbb;
+    }
+</style>
+
+{% endblock %}

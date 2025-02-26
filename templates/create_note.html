@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Create Note{% endblock %}
+{% block content %}
+
+<div class="cosmic-container">
+  <h1>📝 Create a New Thought</h1>
+
+  <form method="POST" class="neural-form">
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    
+    <div class="form-group">
+      <label for="title">Note Title</label>
+      {{ form.title(class="neural-input", id="title", placeholder="Enter note title", required=True) }}
+      {% for error in form.title.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      <label for="content">Neural Patterns</label>
+      {{ form.content(class="quantum-editor", id="content", rows=10, placeholder="Write your thoughts here...", required=True) }}
+      {% for error in form.content.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="quantum-button">💾 Save</button>
+      <button type="button" class="quantum-button secondary" onclick="location.href='{{ url_for('notes_list') }}'">❌ Cancel</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .error-message {
+    color: red;
+    font-size: 0.9em;
+  }
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+</style>
+{% endblock %}

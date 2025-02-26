@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}View Note{% endblock %}
+{% block content %}
+
+<div class="quantum-container">
+  <h1>📝 {{ note.title }}</h1>
+
+  <div class="note-meta">
+    <p>📅 Created: {{ note.created_at.strftime('%B %d, %Y') }}</p>
+    <p>🔗 Shareable Link: <input type="text" value="{{ request.url }}" readonly class="share-link"></p>
+  </div>
+
+  <div class="note-content">
+    <p>{{ note.content|safe }}</p>
+  </div>
+
+  <div class="note-actions">
+    <button onclick="copyLink()" class="quantum-button">📋 Copy Link</button>
+    <a href="{{ url_for('edit_note', note_id=note.id) }}" class="quantum-button">✏️ Edit Note</a>
+  </div>
+</div>
+
+<script>
+function copyLink() {
+    const linkInput = document.querySelector('.share-link');
+    linkInput.select();
+    document.execCommand('copy');
+    alert('🔗 Link copied to clipboard!');
+}
+</script>
+
+{% endblock %}

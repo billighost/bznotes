@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="cosmic-container">
+  <div class="holo-header">
+    <h1 class="cyber-title">📒 Neural Notes</h1>
+    <a href="{{ url_for('create_note') }}" class="quantum-button">➕ New Thought</a>
+  </div>
+
+  <div class="search-field">
+    <input type="text" placeholder="🔍 Search notes..." class="neural-input" id="searchInput" data-search-url="{{ url_for('search_notes') }}">
+  </div>
+
+  <div class="grid-system" id="notesGrid">
+    {% for note in notes %}
+    <div class="holo-card note-card" data-id="{{ note.id }}" data-title="{{ note.title }}" data-content="{{ note.content }}" data-date="{{ note.created_at.strftime('%Y-%m-%d') }}">
+      <div class="card-content">
+        <div class="note-header">
+          <h3 class="note-title">{{ note.title }}</h3>
+          <div class="note-meta">
+            <span class="time-since">🕒 {{ note.created_at.strftime('%b %d, %Y') }}</span>
+            <div class="note-actions">
+              <button class="hologram-icon" onclick="location.href='{{ url_for('edit_note', note_id=note.id) }}'">✏️</button>
+              <form action="{{ url_for('delete_note', note_id=note.id) }}" method="POST" class="delete-form">
+                <button type="submit" class="hologram-icon danger" onclick="return confirm('Permanently delete this note?')">🗑️</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="note-preview">{{ note.content|truncate(200)|safe }}</div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="quantum-flare"></div>
+      <h3>No notes found</h3>
+      <p>Start writing your thoughts now.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

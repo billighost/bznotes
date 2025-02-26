@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Diary{% endblock %}
+{% block content %}
+
+<div class="cosmic-container">
+  <h1>📔 Neural Diary</h1>
+
+  <div class="diary-controls">
+    <button onclick="toggleCalculator()" class="quantum-button">🧮 Calculator</button>
+    <button onclick="toggleSpellCheck()" class="quantum-button">🔍 Spell Check</button>
+    <button onclick="toggleNightMode()" class="quantum-button">🌙 Night Mode</button>
+  </div>
+
+  <div id="diaryContent" contenteditable="true" class="diary-editor"></div>
+
+  <div class="diary-info">
+    <span id="wordCount">📝 0 words</span> | 
+    <span id="lastSaved">💾 Never saved</span>
+    <button onclick="saveEntry()" class="quantum-button">💾 Save</button>
+  </div>
+
+  <div id="entriesList" class="diary-entries"></div>
+</div>
+
+<script>
+function updateWordCount() {
+  const text = document.getElementById('diaryContent').innerText;
+  document.getElementById('wordCount').innerText = "📝 " + text.trim().split(/\s+/).length + " words";
+}
+
+function saveEntry() {
+  const content = document.getElementById('diaryContent').innerHTML;
+  fetch('/save_entry', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: content })
+  }).then(response => {
+    if(response.ok) {
+      document.getElementById('lastSaved').innerText = "💾 Saved at " + new Date().toLocaleTimeString();
+      loadEntries();
+    }
+  });
+}
+
+function loadEntries() {
+  fetch('/get_entries').then(response => response.json()).then(entries => {
+    document.getElementById('entriesList').innerHTML = entries.map(entry => 
+      `<div class="diary-entry">${new Date(entry.date).toLocaleDateString()}: ${entry.content.replace(/<[^>]+>/g, '').substring(0, 100)}</div>`
+    ).join('');
+  });
+}
+
+function toggleCalculator() { alert("🧮 Calculator toggled"); }
+function toggleSpellCheck() { alert("🔍 Spell check toggled"); }
+function toggleNightMode() { document.body.classList.toggle('night-mode'); }
+
+document.getElementById('diaryContent').addEventListener('input', updateWordCount);
+loadEntries();
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style>
+  .diary-editor {
+    background: #16213e;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    min-height: 200px;
+    color: white;
+  }
+  .diary-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .diary-info {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .diary-entries {
+    margin-top: 20px;
+  }
+  .diary-entry {
+    background: var(--primary);
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    color: white;
+  }
+</style>
+{% endblock %}

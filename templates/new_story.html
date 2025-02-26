@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}New Story{% endblock %}
+{% block content %}
+<div class="quantum-container">
+  <h1>Create a New Story</h1>
+  <form method="POST" action="{{ url_for('new_story') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {{ form.hidden_tag() if form else '' }}  <!-- Flask-WTF CSRF protection -->
+  
+    <div class="form-group">
+      <label for="title">Story Title</label>
+      <input type="text" name="title" id="title" required class="quantum-input" placeholder="Enter story title">
+    </div>
+  
+    <div class="form-group">
+      <label for="description">Story Description</label>
+      <textarea name="description" id="description" rows="3" required class="quantum-editor" placeholder="Enter a brief description"></textarea>
+    </div>
+  
+    <div class="form-group">
+      <label for="genres">Genres</label>
+      <input type="text" name="genres" id="genres" required class="quantum-input" placeholder="Enter genres (e.g., Fantasy, Mystery)">
+    </div>
+  
+    <button type="submit" class="quantum-button">Create Story</button>
+  </form>
+  
+  
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .form-group {
+    margin-bottom: 15px;
+  }
+  .quantum-input, .quantum-editor {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  .quantum-editor {
+    min-height: 100px;
+    resize: vertical;
+  }
+</style>
+{% endblock %}

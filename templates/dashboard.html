@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="quantum-dashboard">
+    <!-- Cosmic Header -->
+    <div class="cosmic-header">
+        <h1 class="neon-title">Welcome, <span class="username-glow">{{ current_user.username }}</span></h1>
+        <div class="quantum-flare"></div>
+    </div>
+
+    <!-- Orbital Quick Access -->
+    <div class="orbital-access">
+        {% set icons = [
+            {'url': url_for('diary_list'), 'emoji': '📖', 'title': 'Diary', 'color': '#64d9ff'},
+            {'url': url_for('my_stories', user_id=current_user.id), 'emoji': '✍️', 'title': 'Write Story', 'color': '#ff69f7'},
+            {'url': url_for('read_stories'), 'emoji': '📚', 'title': 'Read Stories', 'color': '#ff4757'},
+            {'url': url_for('profile'), 'emoji': '😁', 'title': 'Profile', 'color': '#2ecc71'},
+            {'url': url_for('calendar_page'), 'emoji': '🗓️', 'title': 'Calendar', 'color': '#f1c40f'}
+        ] %}
+        
+        {% for icon in icons %}
+        <div class="orbital-item" 
+             style="--orbital-color: {{ icon.color }}"
+             onclick="location.href='{{ icon.url }}'">
+            <div class="orbital-ring"></div>
+            <div class="icon-wrapper">
+                <span class="icon-emoji">{{ icon.emoji }}</span>
+                <h3 class="icon-title">{{ icon.title }}</h3>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Admin Controls (if applicable) -->
+    {% if current_user.is_head() %}
+    <div class="admin-controls">
+        <a href="{{ url_for('notify_users') }}" class="quantum-button cosmic-btn">📢 Send Notification</a>
+        <a href="{{ url_for('users_page') }}" class="quantum-button cosmic-btn">👥 Manage Users</a>
+        <a href="{{ url_for('determine_likes') }}" class="quantum-button cosmic-btn">📊 Determine Likes</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --quantum-blue: #64d9ff;
+    --quantum-purple: #ff69f7;
+    --quantum-red: #ff4757;
+    --quantum-green: #2ecc71;
+    --quantum-yellow: #f1c40f;
+}
+
+.quantum-dashboard {
+    background: radial-gradient(circle at center, #0f0f1f, #000);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.cosmic-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+}
+
+.neon-title {
+    font-size: 4rem;
+    background: linear-gradient(45deg, var(--quantum-blue), var(--quantum-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(100, 217, 255, 0.5);
+}
+
+.username-glow {
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px var(--quantum-blue); }
+    to { text-shadow: 0 0 30px var(--quantum-purple); }
+}
+
+.orbital-access {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.orbital-item {
+    position: relative;
+    padding: 2rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.orbital-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 30px var(--orbital-color);
+}
+
+.orbital-ring {
+    position: absolute;
+    inset: -50%;
+    border: 2px solid var(--orbital-color);
+    border-radius: 50%;
+    animation: orbit 10s linear infinite;
+}
+
+@keyframes orbit {
+    from { transform: rotate(0deg) scale(1); }
+    to { transform: rotate(360deg) scale(1.2); }
+}
+
+.icon-wrapper {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.icon-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.orbital-item:hover .icon-emoji {
+    transform: scale(1.2) rotate(10deg);
+}
+
+.icon-title {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.admin-controls {
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.cosmic-btn {
+    background: linear-gradient(45deg, var(--quantum-blue), var(--quantum-purple));
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    margin: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.cosmic-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(100, 217, 255, 0.5);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Quantum Field Effect
+document.addEventListener('mousemove', (e) => {
+    const items = document.querySelectorAll('.orbital-item');
+    items.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width/2;
+        const y = e.clientY - rect.top - rect.height/2;
+        
+        item.style.transform = `
+            translate(${x/20}px, ${y/20}px)
+            rotate3d(${y/100}, ${x/100}, 0, ${Math.sqrt(x*x + y*y)/50}deg)
+        `;
+    });
+});
+</script>
+{% endblock %}
