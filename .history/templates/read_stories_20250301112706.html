@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Stellar Stories{% endblock %}
+{% block content %}
+
+<div class="celestial-container">
+  <div class="galaxy-header">
+    <h1 class="constellation-title">📖 Stellar Stories 
+      <span class="twinkling-star">✨</span>
+    </h1>
+    
+    <!-- Search Bar -->
+    <div class="nebula-search">
+      <input type="text" 
+             id="searchStories" 
+             placeholder="🔭 Discover hidden tales..." 
+             class="stardust-input"
+             onkeyup="searchStories()">
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="cosmic-filters">
+      <button onclick="sortStories('newest')" class="orbit-button" class>
+        🪐 Newest
+        <div class="hover-planet"></div>
+      </button>
+      <button onclick="sortStories('most_liked')" class="orbit-button">
+        🌟 Top Rated
+        <div class="hover-planet"></div>
+      </button>
+      <button onclick="sortStories('recommendations')" class="orbit-button">
+        🌌 Recommendations
+        <div class="hover-planet"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stories Grid -->
+  <div class="quantum-grid" id="storiesGrid">
+    {% for story in stories %}
+    <div class="celestial-card" 
+         onclick="location.href='{{ url_for('story_time', story_id=story.id) }}'"
+         data-title="{{ story.title }}" 
+         data-author="{{ story.user.username }}" 
+         data-genres="{{ story.genres }}">
+      <div class="card-event-horizon">
+        <img src="{{ story.cover_image }}" 
+             alt="Cover" 
+             class="gravitational-image">
+        <div class="stellar-overlay">
+          <h2 class="supernova-title">{{ story.title }}</h2>
+          <p class="author-constellation">By {{ story.user.username }}</p>
+          <div class="genre-nebula">
+            {% for genre in story.genres.split(',') %}
+            <span class="genre-particle">{{ genre.strip() }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="celestial-stats">
+          <span class="stats-comet">❤️ {{ story.likes }} Light-Years</span>
+          <span class="stats-comet">📅 {{ story.created_at }}</span>
+        </div>
+      </div>
+    </div>
+    {% if current_user.is_head() %}
+        <form action="{{ url_for('deleted_story', story_id=story.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="delete-btn">🗑 Delete</button>
+        </form>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.celestial-container {
+  background: radial-gradient(circle at center, #0f0f1f, #000);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.gravitational-image {
+  height: 250px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.celestial-card {
+  position: relative;
+  cursor: pointer;
+  perspective: 1000px;
+}
+
+.celestial-card:hover .gravitational-image {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) scale(1.05);
+  box-shadow: 0 0 40px rgba(100, 217, 255, 0.4);
+}
+
+.stellar-overlay {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 30%, transparent);
+  width: 100%;
+  padding: 2rem 1rem 1rem;
+  border-radius: 0 0 15px 15px;
+}
+
+.cursor-trail {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: #64d9ff;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: particle-fade 1.2s forwards;
+}
+
+@keyframes particle-fade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(3); }
+}
+
+.quantum-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.search-glow {
+  animation: cosmic-pulse 0.5s ease-out;
+  box-shadow: 0 0 25px rgba(100, 217, 255, 0.5);
+}
+
+@keyframes cosmic-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+.stardust-input {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #64d9ff;
+  border-radius: 25px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.stardust-input:focus {
+  outline: none;
+  box-shadow: 0 0 30px rgba(100, 217, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.constellation-title {
+  font-size: 3.5rem;
+  text-align: center;
+  background: linear-gradient(45deg, #64d9ff, #ff69f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: stellar-float 6s ease-in-out infinite;
+}
+
+@keyframes stellar-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.twinkling-star {
+  animation: star-twinkle 1.5s infinite alternate;
+}
+
+@keyframes star-twinkle {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+</style>
+
+<script>
+// Cosmic Cursor Effect
+let cursorTimer;
+document.addEventListener('mousemove', (e) => {
+  const particle = document.createElement('div');
+  particle.className = 'cursor-trail';
+  particle.style.left = `${e.clientX - 4}px`;
+  particle.style.top = `${e.clientY - 4}px`;
+  document.body.appendChild(particle);
+  setTimeout(() => particle.remove(), 1200);
+
+  document.querySelectorAll('.celestial-card').forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty('--x', `${x}px`);
+    card.style.setProperty('--y', `${y}px`);
+  });
+});
+
+// Search Functionality
+function searchStories() {
+  const input = document.getElementById('searchStories').value.toLowerCase();
+  const cards = document.querySelectorAll('.celestial-card');
+  
+  cards.forEach(card => {
+    const title = card.dataset.title.toLowerCase();
+    const author = card.dataset.author.toLowerCase();
+    const genres = card.dataset.genres.toLowerCase();
+    
+    const isVisible = title.includes(input) || 
+                     author.includes(input) || 
+                     genres.includes(input);
+    
+    card.style.display = isVisible ? 'block' : 'none';
+    
+    if (isVisible) {
+      card.classList.add('search-glow');
+      setTimeout(() => card.classList.remove('search-glow'), 500);
+    }
+  });
+}
+
+// Sorting Functionality
+function sortStories(sortBy) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', sortBy);
+  window.location.href = url.toString();
+}
+</script>
+
+{% endblock %}

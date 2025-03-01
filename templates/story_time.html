@@ -29,7 +29,7 @@
     <div class="story-content">{{ story.content.replace("\n\n", "</p><p>").replace("\n", " ") | safe }}</div>
 
     <!-- ❤️ Like Button -->
-    {% if current_user.is_authenticated and story.user_id != current_user.id %}
+    {% if current_user.is_authenticated  %}
     <div class="interaction-buttons">
         <button id="like-btn" class="like-button {% if current_user in story.likes %}liked{% endif %}" 
                 onclick="toggleLike({{ story.id }})">

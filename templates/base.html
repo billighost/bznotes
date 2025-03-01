@@ -75,6 +75,45 @@
         font-size: 0.9rem;
         color: #bbb;
     }
+    .quantum-back-btn {
+      position: relative;
+      background: linear-gradient(45deg, #6c5ce7, #64d9ff);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-family: 'Space Grotesk', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(108,92,231,0.5);
+    }
+
+    .quantum-back-btn:hover {
+      transform: scale(1.05) rotate(-2deg);
+      box-shadow: 0 0 30px rgba(100,217,255,0.7);
+    }
+
+    .temporal-glow {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255,255,255,0.3),
+          transparent
+      );
+      animation: temporal-flow 2s infinite;
+    }
+
+    @keyframes temporal-flow {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
   </style>
   {% block styles %}{% endblock %}
 </head>
@@ -85,9 +124,17 @@
         <strong>B'z Notes</strong>
       </div>
       <nav class="nav-links">
+        <!-- Add Quantum Back Button -->
+        <button class="quantum-back-btn" onclick="history.back()">
+            ⏪ 
+            <div class="temporal-glow"></div>
+        </button>
+        <button class="quantum-back-btn" onclick="history.forward()">
+            ⏩
+            <div class="temporal-glow"></div>
+        </button>
         <a href="{{ url_for('home') }}" class="nav-link">Home</a>
         <a href="{{ url_for('about') }}" class="nav-link">About</a>
-        <a href="{{ url_for('privacy_policy') }}" class="nav-link">Privacy and policy</a>
         {% if current_user.is_authenticated %}
           <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
           <a href="{{ url_for('notifications') }}" class="nav-link">Notifications</a>
@@ -96,6 +143,7 @@
         {% else %}
           <a href="{{ url_for('register') }}" class="nav-link">Register</a>
           <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+          <a href="{{ url_for('privacy_policy') }}" class="nav-link">Privacy and policy</a>
         {% endif %}
       </nav>
     </div>

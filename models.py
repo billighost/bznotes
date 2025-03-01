@@ -13,7 +13,6 @@ followers_table = db.Table(
     db.Column('followed_id', db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), primary_key=True),
 )
 
-
 class User(db.Model, UserMixin):
     __tablename__ = "users"
 
@@ -24,7 +23,7 @@ class User(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     bio = db.Column(db.Text, nullable=True)
     profile_picture_url = db.Column(db.String(255), nullable=True)
-    role = db.Column(db.String(10), nullable=False, default="User")  # ✅ User Role Field
+    role = db.Column(db.String(10), nullable=False, default="User")
 
     def __init__(self, **kwargs):
         """Ensure new users get a default role."""
@@ -48,7 +47,7 @@ class User(db.Model, UserMixin):
 
     # Relationship with Story (One-to-Many)
     stories = db.relationship('Story', back_populates='user', lazy=True)
-    
+
     # Relationship for Following Users
     following = db.relationship(
         "User",
@@ -106,29 +105,26 @@ class Story(db.Model):
 
     def update_likes_count(self):
         """Update the total number of likes on this story."""
-        self.likes_count = len(self.likes)
+        self.likes_count = Like.query.filter_by(story_id=self.id).count()
         db.session.commit()
 
 
 class Like(db.Model):
     __tablename__ = "likes"
-
+    
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
     story_id = db.Column(db.Integer, db.ForeignKey("stories.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def after_insert(self):
-        """Update story likes count when a like is added."""
-        story = Story.query.get(self.story_id)
-        if story:
-            story.update_likes_count()
 
-    def after_delete(self):
-        """Update story likes count when a like is removed."""
-        story = Story.query.get(self.story_id)
-        if story:
-            story.update_likes_count()
+class LikeSettings(db.Model):
+    __tablename__ = "like_settings"
+
+    id = db.Column(db.Integer, primary_key=True)
+    head_likes = db.Column(db.Integer, default=5, nullable=False)
+    admin_likes = db.Column(db.Integer, default=3, nullable=False)
+    user_likes = db.Column(db.Integer, default=1, nullable=False)
 
 
 class Comment(db.Model):
@@ -177,3 +173,6 @@ class Note(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_story = db.Column(db.Boolean, default=False)
+
+
+

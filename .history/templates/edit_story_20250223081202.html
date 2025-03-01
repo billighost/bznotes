@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block title %}Edit Story{% endblock %}
+
+{% block content %}
+<div class="container-class">
+  <h1 class="page-title">📝 Edit Your Story</h1>
+  <form method="POST" action="{{ url_for('edit_story', story_id=story.id) }}" enctype="multipart/form-data" class="container-class">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <!-- Story Title -->
+    <div class="form-group">
+      <label for="title" class="elegant-label">📖 Story Title</label>
+      <input type="text" id="title" name="title" value="{{ story.title }}" required class="elegant-input">
+    </div>
+
+    <!-- Cover Image Upload -->
+    <div class="form-group">
+        <label class="elegant-label">🖼 Cover Image</label><br>
+        <img id="cover-preview" src="{{ story.cover_image or '/static/images/default-cover.jpg' }}" 
+            alt="Cover Image" class="cover-preview elegant-image">
+        <input type="file" name="cover_image" class="elegant-input" onchange="previewCover(event)">
+    </div>
+  
+    <!-- Font Selection -->
+    <div class="form-group">
+      <label for="font-select" class="elegant-label">🔤 Select Font</label>
+      <select id="font-select" class="elegant-input" onchange="changeFont(this.value)">
+        <option value="'Poppins', sans-serif">Poppins</option>
+        <option value="'Roboto', sans-serif">Roboto</option>
+        <option value="'Space Mono', monospace">Space Mono</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="'Arial', sans-serif">Arial</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+        <option value="'Verdana', sans-serif">Verdana</option>
+        <option value="'Georgia', serif">Georgia</option>
+      </select>
+    </div>
+
+    <!-- Spellcheck Toggle -->
+    <div class="form-group">
+      <label class="elegant-label">✔️ Spellcheck</label>
+      <button type="button" id="spellcheck-toggle" class="elegant-button" onclick="toggleSpellcheck()">🔠 OFF</button>
+    </div>
+
+    <!-- Content -->
+    <div class="textarea">
+      <label for="content" class="elegant-label">✍️ Story Content</label>
+      <textarea id="content" name="content" rows="12" required class="elegant-textarea">{{ story.content }}</textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-group action-buttons">
+      <button type="submit" name="action" value="save_draft" class="elegant-button">💾 Save Draft</button>
+      <button type="submit" name="action" value="post" class="elegant-button success">🚀 Post Story</button>
+    </div>
+
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ✅ Change Font (Persistent)
+function changeFont(font) {
+  document.getElementById("content").style.fontFamily = font;
+  localStorage.setItem("selectedFont", font);
+}
+
+// ✅ Restore Font on Page Load
+document.addEventListener("DOMContentLoaded", function() {
+  let savedFont = localStorage.getItem("selectedFont");
+  if (savedFont) {
+    document.getElementById("content").style.fontFamily = savedFont;
+    document.getElementById("font-select").value = savedFont;
+  }
+});
+
+// ✅ Toggle Spellcheck (Persistent)
+function toggleSpellcheck() {
+  let editor = document.getElementById("content");
+  let button = document.getElementById("spellcheck-toggle");
+  let spellcheckState = localStorage.getItem("spellcheck") === "true";
+
+  editor.spellcheck = !spellcheckState;
+  button.innerText = editor.spellcheck ? "🔠 ON" : "🔠 OFF";
+  button.style.backgroundColor = editor.spellcheck ? "#4CAF50" : "#FF4B2B";
+
+  localStorage.setItem("spellcheck", editor.spellcheck);
+}
+
+// ✅ Restore Spellcheck on Load
+document.addEventListener("DOMContentLoaded", function() {
+  let savedSpellcheck = localStorage.getItem("spellcheck") === "true";
+  document.getElementById("content").spellcheck = savedSpellcheck;
+  let button = document.getElementById("spellcheck-toggle");
+  button.innerText = savedSpellcheck ? "🔠 ON" : "🔠 OFF";
+  button.style.backgroundColor = savedSpellcheck ? "#4CAF50" : "#FF4B2B";
+});
+
+// ✅ Cover Image Preview
+function previewCover(event) {
+  const reader = new FileReader();
+  reader.onload = function(){
+    document.getElementById("cover-preview").src = reader.result;
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* General Styling */
+.container-class {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.container-class:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Title */
+.page-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #2c3e50;
+  font-weight: 700;
+  letter-spacing: -1px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Fields */
+.form-group {
+  margin-bottom: 25px;
+}
+
+.elegant-label {
+  display: block;
+  font-size: 1.1rem;
+  color: #34495e;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.elegant-input, .elegant-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f9f9f9;
+  color: #2c3e50;
+}
+
+.elegant-input:focus, .elegant-textarea:focus {
+  border-color: #3498db;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+}
+
+/* Cover Image */
+.cover-preview {
+  width: 160px;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 15px;
+  border-radius: 15px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.cover-preview:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.elegant-button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.elegant-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.elegant-button.success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+}
+
+/* Textarea */
+.elegant-textarea {
+  height: 250px;
+  resize: vertical;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  background: #f9f9f9;
+  color: #2c3e50;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  outline: none;
+}
+
+.elegant-textarea::placeholder {
+  color: rgba(44, 62, 80, 0.5);
+}
+
+/* Toggle Button */
+#spellcheck-toggle {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #FF4B2B;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#spellcheck-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 30px;
+}
+</style>
+{% endblock %}

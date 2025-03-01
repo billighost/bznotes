@@ -1,20 +1,57 @@
-<h2>Determine Likes</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}  <!-- ✅ Secure CSRF Token -->
-    
-    <div>
-        <label>Head Likes:</label>
-        {{ form.head_likes(class="form-control") }}
-    </div>
-    <div>
-        <label>Admin Likes:</label>
-        {{ form.admin_likes(class="form-control") }}
-    </div>
-    <div>
-        <label>User Likes:</label>
-        {{ form.user_likes(class="form-control") }}
-    </div>
+{% extends "base.html" %}
+{% block title %}Determine Likes{% endblock %}
+{% block content %}
 
-    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
-</form>
+<div class="like-settings-container">
+    <h1>⚡ Determine Like Weights</h1>
+    <form method="POST">
+        <label>👑 Head Likes</label>
+        <input type="number" name="head_likes" value="{{ settings.head_likes }}" required>
 
+        <label>🛡️ Admin Likes</label>
+        <input type="number" name="admin_likes" value="{{ settings.admin_likes }}" required>
+
+        <label>👤 User Likes</label>
+        <input type="number" name="user_likes" value="{{ settings.user_likes }}" required>
+
+        <button type="submit">Save Changes</button>
+    </form>
+</div>
+
+<style>
+.like-settings-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #1a1a2f;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+label {
+    display: block;
+    margin-top: 1rem;
+}
+input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border-radius: 5px;
+    border: 1px solid white;
+}
+button {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+}
+button:hover {
+    background: #0056b3;
+}
+</style>
+
+{% endblock %}

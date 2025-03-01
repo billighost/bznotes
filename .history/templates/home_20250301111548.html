@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div style="text-align: center; padding: 40px;">
+  <h2>Welcome to B'z Notes Pro</h2>
+  <p>Your ultimate digital notebook for creativity and productivity.<>                                                                                      
+     New to B'z Notes Pro try creating?<a href="{{ url_for('register') }}" style=" color: #f8fafc; border-radius: 1px; text-decoration: color(srgb rgb(253, 252, 252) rgb(245, 246, 245) rgb(245, 245, 249)); margin: 1px;"> An account</a>
+  </p>
+  <div style="margin-top: 30px;">
+    <a href="{{ url_for('register') }}" style="padding: 10px 20px; background: #f1c40f; color: #2c3e50; border-radius: 5px; text-decoration: none; margin: 10px;">Register</a>
+    <a href="{{ url_for('login') }}" style="padding: 10px 20px; background: #f1c40f; color: #2c3e50; border-radius: 5px; text-decoration: none; margin: 10px;">Login</a>
+    <a href="{{ url_for('about') }}" style="padding: 10px 20px; background: #f1c40f; color: #2c3e50; border-radius: 5px; text-decoration: none; margin: 10px;">About</a>
+  </div>
+</div>
+{% endblock %}
